@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=1080, initial-scale=1.0" />
+		<title>Traffic Flow Prediction System</title>
+
+		<style>
+			form {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.returned-data {
+				margin: auto;
+				text-align: center;
+				width: 30%;
+			}
+		</style>
+
+		<script defer>
+			function minsToTimeStr(mins) {
+				const remainingMins = mins % 60
+				const hours = Math.floor(mins / 60)
+				
+				return `${hours}:${Math.round(remainingMins)}`
+			}
+
+			function submitForm() {
+				const street1 = document.getElementById('Street-1').value;
+				const street2 = document.getElementById('Street-2').value;
+				const time = document.getElementById('time').value;
+				const model = document.getElementById('model').value;
+
+				let correctedTime = parseInt(time.split(':')[0]) * 60 + parseInt(time.split(':')[1]);
+
+				console.log(
+					`/api?origin=${street1}&destination=${street2}&time=${correctedTime}&model=${model}`
+				);
+				const data = fetch(
+					`/api?origin=${street1}&destination=${street2}&time=${correctedTime}&model=${model}`
+				).then((response) => {
+					response.json().then((data) => {
+						console.log(data)
+
+						document.getElementById('total-time').innerText = `The journey will take approximately ${Math.round(parseFloat(data.totalTime))} mins and you will arrive at ${minsToTimeStr(correctedTime + parseFloat(data.totalTime))}`;
+						document.getElementById('total-distance').innerText = `${Math.round(parseFloat(data.distance))} km`;
+						document.getElementById('route').innerText = data.route.join(' => ');
+					})
+				});
+			}
+		</script>
+	</head>
+	<body>
+		<form action="javascript:submitForm()">
+			<label for="Street-1">Origin</label>
+			<select name="Street 1" id="Street-1">
+				{% for location in locations %}
+				<option value="{{ location.id }}">
+					{{ location.street1 }} | {{ location.street2 }}
+				</option>
+				{% endfor %}
+			</select>
+			<label for="Street-2">Destination</label>
+			<select name="Street 2" id="Street-2">
+				{% for location in locations %}
+				<option value="{{ location.id }}">
+					{{ location.street1 }} | {{ location.street2 }}
+				</option>
+				{% endfor %}
+			</select>
+			<label for="time">Time</label>
+			<input type="time" value="12:00" id="time" />
+			<label for="model">Model</label>
+			<select name="Model" id="model">
+				<option value="lstm">LSTM</option>
+				<option value="my_model">Our Model</option>
+				<option value="gru">GRU</option>
+			</select>
+			<button type="submit">Get Route!</button>
+		</form>
+		<p class="returned-data" id="route"></p>
+		<p class="returned-data" id="total-time"></p>
+		<p class="returned-data" id="total-distance"></p>
+	</body>
+</html>

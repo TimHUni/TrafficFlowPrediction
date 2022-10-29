@@ -85,28 +85,34 @@ def main(argv):
         help="Model to train.")
     args = parser.parse_args()
 
-    lag = 12
-    config = {"batch": 256, "epochs": 2}
-    file1 = 'data/train.csv'
+    lag = 4
+    config = {"batch": 256, "epochs": 600}
+    file1 = 'data/BoroondaraData.csv'
     file2 = 'data/test.csv'
-    X_train, y_train, _, _, _ = process_data(file1, file2, lag)
+    X_train, y_train, _, _, _, _, _ = process_data(file1, file2, lag)
 
-    if args.model == 'my_model':
-        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
-        m = model.get_my_model([12, 32, 64, 1])
-        train_model(m, X_train, y_train, args.model, config)
-    if args.model == 'lstm':
-        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_lstm([12, 64, 64, 1])
-        train_model(m, X_train, y_train, args.model, config)
-    if args.model == 'gru':
-        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_gru([12, 64, 64, 1])
-        train_model(m, X_train, y_train, args.model, config)
-    if args.model == 'saes':
-        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
-        m = model.get_saes([12, 400, 400, 400, 1])
-        train_seas(m, X_train, y_train, args.model, config)
+    # print(X_train)
+    # print(X_train[0])
+    # print(X_train.shape)
+
+    # return
+
+    # if args.model == 'my_model':
+    X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
+    m = model.get_my_model([3, 32, 64, 1])
+    train_model(m, X_train, y_train, 'my_model', config)
+    # if args.model == 'lstm':
+    X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+    m = model.get_lstm([3, 64, 64, 1])
+    train_model(m, X_train, y_train, 'lstm', config)
+    # if args.model == 'gru':
+    # X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+    # m = model.get_gru([3, 64, 64, 1])
+    # train_model(m, X_train, y_train, args.model, config)
+    # if args.model == 'saes':
+    #     X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
+    #     m = model.get_saes([3, 400, 400, 400, 1])
+    #     train_seas(m, X_train, y_train, args.model, config)
 
 
 if __name__ == '__main__':
